@@ -1,0 +1,12 @@
+{application, bomberlman,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { bomberlman_app, []}},
+  {env, []}
+ ]}.
