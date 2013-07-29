@@ -10,8 +10,19 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+  Static = fun(FileType) ->
+    {
+      list:append(["/", FileType, "/[...]"]), cowboy_static, [
+        {directory, {priv_dir, bomberlman, [list_to_binary(FileType)] }},
+        {mimetypes, {fun mimetypes:path_to_mimes/2, default}}
+      ]
+    }
+  end,
   Dispatch = cowboy_router:compile([
     {'_', [
+      Static("css"),
+      Static("js"),
+      Static("img"),
       {"/", index_handler, []},
       {'_', notfound_handler, []}
     ]}

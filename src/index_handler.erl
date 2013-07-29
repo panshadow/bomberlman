@@ -7,7 +7,7 @@ init({tcp, http}, Req, _Opts) ->
   {ok, Req, undefined_state}.
 
 handle(Req, State) ->
-  Body = <<"<h1>in:side</h1>">>,
+  Body = <<"<html><head><style>@import url(/static/styles.css);</style><script src=\"/static/js/script.js\"></script><body><h1>in:side</h1></body></html>">>,
   {ok, Resp} = cowboy_req:reply(200, [], Body, Req),
   {ok, Resp, State}.
 
