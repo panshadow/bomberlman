@@ -1,3 +1,28 @@
+html {
+  height: 100%;
+}
+
 body {
-  background-color: #999;
+  height: 100%;
+  min-height: 100%;
+  padding: 0;
+  margin: 0;
+  background: white url(../img/Cowboy_Sketch_by_Kalel06.jpg) left bottom no-repeat;
+}
+
+#zero {
+  height: 100%;
+  width: 100%;
+  padding: 0;
+}
+
+#content {
+  margin: 0;
+  padding: 40px;
+}
+
+#content h1 {
+  margin: 40px auto 0;
+  text-align: center;
+  padding:0;
 }
