@@ -10,6 +10,13 @@
 %% ===================================================================
 
 start(_StartType, _StartArgs) ->
+  Index = {
+    "/", cowboy_static, [
+      {directory, {priv_dir, bomberlman, []} },
+      {file, "index.html"},
+      {mimetypes, {fun mimetypes:path_to_mimes/2, default}}
+    ]
+  },
   Static = {
       "/[...]", cowboy_static, [
         {directory, {priv_dir, bomberlman, [] }},
@@ -18,6 +25,7 @@ start(_StartType, _StartArgs) ->
     },
   Dispatch = cowboy_router:compile([
     {'_', [
+      Index, 
       Static,
       {'_', notfound_handler, []}
     ]}
