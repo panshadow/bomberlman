@@ -1,4 +1,4 @@
--module(notfound_handler).
+-module(bomberlman_404).
 -behaviour(cowboy_http_handler).
 %% Cowboy_http_handler callbacks
 -export([

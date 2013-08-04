@@ -23,11 +23,12 @@ start(_StartType, _StartArgs) ->
         {mimetypes, {fun mimetypes:path_to_mimes/2, default}}
       ]
     },
+  NotFound = {'_', bomberlman_404, []},
   Dispatch = cowboy_router:compile([
     {'_', [
       Index, 
       Static,
-      {'_', notfound_handler, []}
+      NotFound
     ]}
   ]),
   Port = 8000,
