@@ -2,7 +2,7 @@
 
 -export([start/0, stop/0]).
 
--define(APPS, [crypto, ranch, cowboy, bomberlman]).
+-define(APPS, [crypto, ranch, cowboy, gproc, bomberlman]).
 
 start() ->
   ok = ensure_started(?APPS),
