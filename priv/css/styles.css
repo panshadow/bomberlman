@@ -26,3 +26,11 @@ body {
   text-align: center;
   padding:0;
 }
+
+.ping {
+  color: #333;
+}
+
+.ping.pong {
+  color: #777;
+}
