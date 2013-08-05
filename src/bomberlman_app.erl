@@ -24,9 +24,11 @@ start(_StartType, _StartArgs) ->
       ]
     },
   NotFound = {'_', bomberlman_404, []},
+  WebSockets = { "/ws/", bomberlman_ws, []},
   Dispatch = cowboy_router:compile([
     {'_', [
       Index, 
+      WebSockets,
       Static,
       NotFound
     ]}
