@@ -9,6 +9,16 @@
 %% Application callbacks
 %% ===================================================================
 
+
+get_ienv(Name, Default) ->
+  case os:getenv(Name) of
+    false -> Default;
+    Val -> case string:to_integer(Val) of
+      {error, _} -> Default;
+      {NVal,_} -> NVal
+    end
+  end.
+
 start(_StartType, _StartArgs) ->
   Index = {
     "/", cowboy_static, [
@@ -33,7 +43,7 @@ start(_StartType, _StartArgs) ->
       NotFound
     ]}
   ]),
-  Port = 8000,
+  Port = get_ienv("BOMBERLMAN_PORT",9000),
   {ok, _} = cowboy:start_http(http_listener,100,
     [{port, Port}],
     [{env, [{dispatch, Dispatch}]}]
