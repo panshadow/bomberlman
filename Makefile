@@ -1,6 +1,6 @@
 all: deps compile
 
-deps:
+deps: rebar.config
 	rebar get-deps
 
 compile: ebin/bomberlman.app
