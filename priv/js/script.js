@@ -1,10 +1,12 @@
 $(function(){
   var header = $('h1#header');
+  var outbox = $('#console');
   var ws = new WebSocket('ws://' + window.location.host + '/ws/');
   header.addClass('ping');
 
   ws.onmessage = function(evt){
-    console.log(evt.data);
+    var msg = $("<div/>").addClass('msg').text(evt.data);
+    outbox.append( msg );
     header.toggleClass('pong');
   }
 

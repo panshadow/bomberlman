@@ -34,3 +34,15 @@ body {
 .ping.pong {
   color: #777;
 }
+
+#console {
+  margin: 10px 0 0 460px;
+  padding: 4px;
+  border-radius: 8px 0 0;
+  border: solid 1px;
+  border-width: 2px 0 0 1px;
+}
+
+#console .msg {
+  color: #444;
+}

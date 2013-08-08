@@ -15,8 +15,10 @@ init({_TransportName, _Protocol}, _Req, _Opts) ->
 
 websocket_init(_TransportName, Req, _Opts) ->
   io:format("init>\n"),
+  {{RemoteHost,RemotePort},_} = cowboy_req:peer(Req),
+  RemoteAddr = io_lib:format("New [~p.~p.~p.~p:~p]",tuple_to_list(RemoteHost) ++ [RemotePort]),
   gproc:reg({p,l,bomberlman_arena}),
-  gproc:send({p,l,bomberlman_arena},{notify, <<"New">>}),
+  gproc:send({p,l,bomberlman_arena},{notify, list_to_binary(RemoteAddr)}),
   {ok, Req, #wss{count=0}, hibernate}.
 
 websocket_handle({text, Data}, Req, State) ->

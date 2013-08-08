@@ -44,6 +44,7 @@ start(_StartType, _StartArgs) ->
     ]}
   ]),
   Port = get_ienv("BOMBERLMAN_PORT",9000),
+  io:format("start listening on ~p port\n",[Port]),
   {ok, _} = cowboy:start_http(http_listener,100,
     [{port, Port}],
     [{env, [{dispatch, Dispatch}]}]
