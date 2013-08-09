@@ -1,17 +1,31 @@
 $(function(){
-  var header = $('h1#header');
-  var outbox = $('#console');
-  var ws = new WebSocket('ws://' + window.location.host + '/ws/');
+  var header = $('#header'),
+    outbox = $('#console'),
+    ws = new WebSocket('ws://' + window.location.host + '/ws/');
+
   header.addClass('ping');
 
   ws.onmessage = function(evt){
-    var msg = $("<div/>").addClass('msg').text(evt.data);
-    outbox.append( msg );
-    header.toggleClass('pong');
-  }
+    var msg = JSON.parse(evt.data);
+    if( 'type' in msg){
+      if( msg.type === 'NOTIFY' ){
+        var divMsg = $("<div/>").addClass('msg').text(msg.data.host.join('.') + ':' + msg.data.port);
+        outbox.append( divMsg );
+
+      }
+      else if( msg.type === 'PONG' ){
+        header.toggleClass('pong');  
+      }
+    }
+    
+  };
 
   var wsInterval = setInterval(function(){
-    ws.send('ping');
+    var msg = { 
+      type: 'PING', 
+      data: {}
+    };
+    ws.send(JSON.stringify(msg));
   },1000);
 
   window.wsPingPongStop = function(){

@@ -13,18 +13,28 @@ init({_TransportName, _Protocol}, _Req, _Opts) ->
   {upgrade, protocol, cowboy_websocket}.
 
 
+wsmsg(Type,Data) ->
+  {[{type, Type},{data, Data}]}.
+
 websocket_init(_TransportName, Req, _Opts) ->
-  io:format("init>\n"),
   {{RemoteHost,RemotePort},_} = cowboy_req:peer(Req),
-  RemoteAddr = io_lib:format("New [~p.~p.~p.~p:~p]",tuple_to_list(RemoteHost) ++ [RemotePort]),
+  Msg = wsmsg(<<"NOTIFY">>,{[
+      {<<"host">>, tuple_to_list(RemoteHost)}, 
+      {<<"port">>, RemotePort}
+    ]}
+  ),
   gproc:reg({p,l,bomberlman_arena}),
-  gproc:send({p,l,bomberlman_arena},{notify, list_to_binary(RemoteAddr)}),
+  gproc:send({p,l,bomberlman_arena},{notify, jiffy:encode(Msg)}),
   {ok, Req, #wss{count=0}, hibernate}.
 
-websocket_handle({text, Data}, Req, State) ->
-  io:format("msg> ~p\n",[Data]),
-  io:format("state> ~p\n",[State]),
-  { reply, {text, <<"PONG: ",Data/binary>>}, Req, State#wss{count=State#wss.count+1}, hibernate };
+
+websocket_handle({text, JSON}, Req, State) ->
+  {[{<<"type">>,Type},{<<"data">>,_Data}]} = jiffy:decode(JSON),
+  Resp = case Type of
+    <<"PING">> -> wsmsg(<<"PONG">>,{[]});
+    _ -> wsmsg(<<"UNKNOWN">>,{[]})
+  end,
+  {reply, {text, jiffy:encode(Resp)}, Req, State#wss{count=State#wss.count+1}, hibernate };
 
 
 websocket_handle(_Any, Req, State) ->
@@ -33,7 +43,8 @@ websocket_handle(_Any, Req, State) ->
 
 websocket_info({notify, Msg}, Req, State) ->
   io:format("notify> ~p",[Msg]),
-  {reply, {text, <<"NOTIFY: ",Msg/binary>>}, Req, State#wss{count=State#wss.count+1}, hibernate };
+  {reply, {text, Msg}, Req, State#wss{count=State#wss.count+1}, hibernate };
+
 websocket_info(_Info, Req, State) ->
   io:format("info>\n"),
   {ok, Req, State, hibernate}.
