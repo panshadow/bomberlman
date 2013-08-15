@@ -1,0 +1,61 @@
+#arena {
+  @size: 128px;
+  @bsize: @size/8;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10*@size;
+  height: 4*@size;
+  margin: -2*@size 0 0 -5*@size;
+  border: solid 1px;
+  background-color: #314159;
+  .erlman {
+
+    width: @size;
+    height: @size;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top:0;
+    left:0;
+    background-image: url(../img/body.png);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+
+    &.remote {
+      background-position: 0 -1*@size;      
+    }
+
+    .info {
+      position: absolute;
+      top:62px;
+      right: 12px;
+      font-size: 12px;
+    }
+    
+    .bottom {
+      position: absolute;
+      bottom:0;
+      left:0;
+      margin: 0;
+      padding: 0;
+
+      width: 100%;
+      height: @bsize;
+      background: url(../img/foots.png) 0 -3*@bsize no-repeat;
+    }
+
+    &.step{
+      .bottom{
+        background-position: 0 -2*@bsize;  
+      }
+
+      &.step-next {
+        .bottom{
+          background-position: 0 -1*@bsize;
+        }
+      }
+    }
+  }  
+}
