@@ -5,7 +5,7 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 10*@size;
+  width: 6*@size;
   height: 4*@size;
   margin: -2*@size 0 0 -5*@size;
   border: solid 1px;

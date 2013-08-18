@@ -4,7 +4,7 @@
 
     var _reg = {
       shown: false,
-      local: false,
+      local: opt.local,
       top: opt.top,
       left: opt.left
     };
@@ -34,6 +34,7 @@
 
       $('#arena').append( self.$.el );
       self.$.el.css({'top':self.reg('top')+'px', 'left': self.reg('left')+'px'});
+      self.$.el.toggleClass('remote',!self.reg('local'));
       self.reg('shown',true);
     }
   }

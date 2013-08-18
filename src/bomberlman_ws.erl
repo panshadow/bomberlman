@@ -1,7 +1,9 @@
 -module(bomberlman_ws).
 -behavior(cowboy_websocket_handler).
 
--record(wss, {ticks=0}).
+-record(wss, {ticks=0,ip={},port=0}).
+
+-define(GLOBAL, bomberlman_arena).
 
 -export([init/3,
     websocket_init/3,
@@ -23,14 +25,10 @@ wsmsg(new, Type, Data) ->
 
 
 websocket_init(_TransportName, Req, _Opts) ->
-  {{RemoteHost,RemotePort},_} = cowboy_req:peer(Req),
-  Msg = wsmsg(new, <<"NOTIFY">>,[
-      {host, tuple_to_list(RemoteHost)}, 
-      {port, RemotePort}
-  ]),
-  gproc:reg({p,l,bomberlman_arena}),
-  gproc:send({p,l,bomberlman_arena},{notify, Msg}),
-  {ok, Req, #wss{ticks=0}, hibernate}.
+  gproc:reg({p,l,?GLOBAL}),
+  {{Host, Port},_} = cowboy_req:peer(Req),
+  gproc:send({p,l,?GLOBAL},{notify_all,self(),new_connection}),
+  {ok, Req, #wss{ticks=0,port=Port, ip=tuple_to_list(Host)}, hibernate}.
 
 
 websocket_handle({text, JSON}, Req, State) ->
@@ -49,6 +47,13 @@ websocket_handle(_Any, Req, State) ->
 websocket_info({notify, Msg}, Req, State) ->
   reply(Msg, Req, State);
 
+
+websocket_info({notify_all, Pid, new_connection}, Req, State) ->
+  Self = self(),
+  Local = (Self==Pid),
+  new_player(Local, Req, State);
+
+
 websocket_info(_Info, Req, State) ->
   io:format("info>\n"),
   {ok, Req, State, hibernate}.
@@ -66,4 +71,12 @@ reply(Msg, Req, State) ->
 
 ping_pong(Req, State) ->
   Msg = wsmsg(new, <<"PONG">>,[{ticks, State#wss.ticks}]),
+  reply(Msg, Req, State).
+
+new_player(Local, Req, State) ->
+  Msg = wsmsg(new, 'NEW_PLAYER',[
+      {local, Local},
+      {host, State#wss.ip},
+      {port, State#wss.port}
+    ]),
   reply(Msg, Req, State).
