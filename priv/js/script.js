@@ -25,8 +25,8 @@ $(function(){
       }
       else if(msg.type === 'NEW_PLAYER' ){
         erl = new ErlMan({
-            top: Math.round(Math.random()*aheight),
-            left: Math.round(Math.random()*awidth),
+            top: 0,
+            left: 0,
             local: msg.data.local
         });
 
@@ -50,9 +50,20 @@ $(function(){
       data: {}
     };
     ws.send(JSON.stringify(msg));
-  },1000);
+  },5000);
 
   window.wsPingPongStop = function(){
     clearInterval(wsInterval);
   }
+
+  $(document.body).bind('keydown',function(evt){
+    if( _erl ){
+      switch(evt.which){
+        case 73: _erl.move_up(); break;
+        case 74: _erl.move_left(); break;
+        case 75: _erl.move_down(); break;
+        case 76: _erl.move_right(); break;
+      }
+    }
+  });
 });

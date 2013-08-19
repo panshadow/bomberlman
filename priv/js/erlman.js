@@ -37,6 +37,9 @@
       self.$.el.toggleClass('remote',!self.reg('local'));
       self.reg('shown',true);
     }
+    else{
+      self.$.el.css({'top':self.reg('top')+'px', 'left': self.reg('left')+'px'});
+    }
   }
 
   ErlMan.prototype.step = function(){
@@ -53,5 +56,20 @@
       this.reg('info', text);
     }
   }
+
+  ErlMan.prototype.move_by = function(dx,dy) {
+    var self = this;
+
+    self.reg('top', self.reg('top') + dy);
+    self.reg('left', self.reg('left') + dx);
+
+    self.show();
+    self.next_step();
+  }
+
+  ErlMan.prototype.move_up = function(){ this.move_by(0,-5); }
+  ErlMan.prototype.move_left = function(){ this.move_by(-5,0); }
+  ErlMan.prototype.move_right = function(){ this.move_by(5,0); }
+  ErlMan.prototype.move_down = function(){ this.move_by(0,5); }
 
 }(this));
