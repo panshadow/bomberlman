@@ -24,11 +24,15 @@ wsmsg(new, Type, Data) ->
   {[{type, Type},{data, {Data}} ]}.
 
 
+get_peer(Req) ->
+  {{Host, Port}, _ } = cowboy_req:peer(Req),
+  {tuple_to_list(Host), Port}.
+
 websocket_init(_TransportName, Req, _Opts) ->
   gproc:reg({p,l,?GLOBAL}),
-  {{Host, Port},_} = cowboy_req:peer(Req),
-  gproc:send({p,l,?GLOBAL},{notify_all,self(),new_connection}),
-  {ok, Req, #wss{ticks=0,port=Port, ip=tuple_to_list(Host)}, hibernate}.
+  {Host, Port} = get_peer(Req),
+  gproc:send({p,l,?GLOBAL},{notify_all,self(),new_connection, {Host, Port}}),
+  {ok, Req, #wss{ticks=0,port=Port, ip=Host}, hibernate}.
 
 
 websocket_handle({text, JSON}, Req, State) ->
@@ -48,10 +52,22 @@ websocket_info({notify, Msg}, Req, State) ->
   reply(Msg, Req, State);
 
 
-websocket_info({notify_all, Pid, new_connection}, Req, State) ->
+websocket_info({notify_all, Pid, new_connection, Peer}, Req, State) ->
   Self = self(),
-  Local = (Self==Pid),
-  new_player(Local, Req, State);
+  case Pid of
+    Self -> new_player(true, Peer, Req, State);
+    _ ->
+      gproc:send({p,l,?GLOBAL},{notify_all,Pid, old_connection, Peer}),
+      new_player(false, Peer, Req, State)
+  end;
+
+websocket_info({notify_all, Pid, old_connection, Peer}, Req, State) ->
+  Self = self(),
+  case Pid of
+    Self -> remote_player(Peer,Req, State);
+    _ -> 
+      {ok, Req, State, hibernate}
+  end;
 
 
 websocket_info(_Info, Req, State) ->
@@ -73,10 +89,18 @@ ping_pong(Req, State) ->
   Msg = wsmsg(new, <<"PONG">>,[{ticks, State#wss.ticks}]),
   reply(Msg, Req, State).
 
-new_player(Local, Req, State) ->
+new_player(Local, {Host, Port}, Req, State) ->
   Msg = wsmsg(new, 'NEW_PLAYER',[
       {local, Local},
-      {host, State#wss.ip},
-      {port, State#wss.port}
-    ]),
+      {host, Host},
+      {port, Port}
+  ]),
   reply(Msg, Req, State).
+
+remote_player({Host, Port}, Req, State) ->
+  Msg = wsmsg(new, 'NEW_PLAYER', [
+    {local, false},
+    {host, Host},
+    {port, Port}
+  ]),
+  reply(Msg, Req, State).  
