@@ -1,3 +1,6 @@
+@canvas_w: 640px;
+@canvas_h: 480px;
+
 html {
   height: 100%;
 }
@@ -7,13 +10,25 @@ body {
   min-height: 100%;
   padding: 0;
   margin: 0;
-  background: #177245;
+  background: black;
 }
 
 #zero {
-  height: 100%;
-  width: 100%;
   padding: 0;
+  margin: 0;
+  border-width: 0;
+
+  canvas {
+    
+    width: @canvas_w;
+    height: @canvas_h;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin: -@canvas_h/2 0 0 -@canvas_w/2;
+    padding: 0;
+    border-width: 0;
+  }
 }
 
 #content {
@@ -28,7 +43,7 @@ body {
   color: #333;
 
   &.pong {
-    color: #777;  
+    color: #777;
   }
 }
 
